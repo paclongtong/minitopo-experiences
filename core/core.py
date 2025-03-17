@@ -17,7 +17,9 @@ from queue import Queue
 """ Let 2 hours to complete the experiment """
 # This should be sufficient for the worst case topology (~0.10 Mbps to download 20 MB on single-path)
 THREAD_TIMEOUT = 7200
-tmpfs_db_path = '/dev/shm/experiment_data.db'
+QUICHE_LOG = ''
+tmpfs_db_path = '/tmp/experiment_data.db'
+tmpfs_path = "/tmp/minitopo_experiences/"
 
 
 """ Some useful functions """
@@ -254,7 +256,7 @@ class ExperienceLauncher(object):
 
         self.cleanMininet(num)
         cmd = 'ssh -p ' + self.remotePorts[num] + ' ' + self.remoteHostnames[num] + \
-              ' "cd ' + kwargs["tmpfs"] + '; sudo /home/bolong/.pyenv/versions/3.8.10/bin/python -u /home/bolong/minitopo/runner.py -x ' + os.path.basename(kwargs["xpAbsPath"]) + ' -t ' + \
+              ' "cd ' + kwargs["tmpfs"] + '; sudo /usr/bin/python -u /home/paul/minitopo/runner.py -x ' + os.path.basename(kwargs["xpAbsPath"]) + ' -t ' + \
               os.path.basename(kwargs["topoAbsPath"]) + '"'
               # ' "cd ' + kwargs["tmpfs"] + '; sudo ~/.pyenv/versions/3.8.10/bin/python ~/minitopo/runner.py --experiment_param_file ' + os.path.abspath(kwargs["xpAbsPath"]) + ' --topo_param_file ' + \
               # os.path.abspath(kwargs["topoAbsPath"]) + '"'
@@ -326,7 +328,7 @@ class ExperienceLauncher(object):
                 # transfer_time = 0.00
                 print(f"Transfer time of topo {topology_id} not found, inserted 0.00 as transfer time")
                 try:
-                    with open("/dev/shm/minitopo_experiences/quiche_client.log") as f:
+                    with open(f"{tmpfs_path}quiche_client.log") as f:
                         print(f.readlines())
                     return
                 except:

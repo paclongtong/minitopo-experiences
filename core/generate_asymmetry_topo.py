@@ -17,7 +17,7 @@ def generate_latency_asymmetry_topology(file_size_MB, latency_asymmetry_ratio, b
     # Adjust bandwidth based on file size and BDP (targeting realistic conditions)
     bdp = file_size_MB * 8 * 8 / uplink_latency  # BDP in Kbps
     uplink_bandwidth = bdp / 2  # ensure BDP-adaptive, not excessively high
-    downlink_bandwidth = uplink_bandwidth * 1  # slightly asymmetric bandwidth
+    downlink_bandwidth = uplink_bandwidth * latency_asymmetry_ratio  # asymmetric bandwidth scaled from the baseline path as much as latency
 
     # Queuing delay estimation (optional, simplified here)
     uplink_queuing_delay = 0.05  # ms
@@ -92,7 +92,7 @@ def generate_loss_asymmetry_topology(file_size_MB, loss_ratio, base_loss=0.5):
 
 # Example usage
 file_size_MB = 50  # MB
-latency_asymmetry_ratio = 8.0  # downlink latency is twice the uplink
+latency_asymmetry_ratio = 16.0  # downlink latency is twice the uplink
 loss_ratio = 4  # downlink loss is 1.5 times the uplink
 
 latency_asymmetric_topology = generate_latency_asymmetry_topology(file_size_MB, latency_asymmetry_ratio)

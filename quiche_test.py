@@ -48,7 +48,7 @@ def getPostProcessingList(**kwargs):
     return toReturn
 
 
-def quicTests(topos, topo_ids, protocol="quic", tmpfs="/dev/shm/minitopo_experiences"):
+def quicTests(topos, topo_ids, protocol="quic", tmpfs="/tmp/minitopo_experiences"):
     experienceLauncher = core.ExperienceLauncher(REMOTE_SERVER_RUNNER_HOSTNAME, REMOTE_SERVER_RUNNER_PORT)
 
     def testsXp(**kwargs):
@@ -66,14 +66,14 @@ def quicTests(topos, topo_ids, protocol="quic", tmpfs="/dev/shm/minitopo_experie
                     # QUIC_MULTIPATH: kwargs["multipath"],
                     # RMEM: (10240, 87380, 16777216),
                     # SIZE: "20971520",
-                    SIZE: "52428800",
+                    SIZE: "104857600",
                     CLIENT_FLAGS: "--no-verify",
                     SERVER_FLAGS: "--disable-gso",
                     ENV: "RUST_BACKTRACE=full RUST_LOG=info",
 
                     # Server-specific
-                    CERT_PATH: "/home/bolong/quiche-multipath/quiche/apps/src/bin/cert.crt",
-                    KEY_PATH: "/home/bolong/quiche-multipath/quiche/apps/src/bin/cert.key",
+                    CERT_PATH: "/home/paul/multipath-quiche/apps/src/bin/cert.crt",
+                    KEY_PATH: "/home/paul/multipath-quiche/apps/src/bin/cert.key",
                     LISTEN_ADDR: "10.1.0.1:4433",
                     ROOT_DIR: kwargs["tmpfs"],
                     INDEX_FILE: "index.html",
@@ -82,8 +82,8 @@ def quicTests(topos, topo_ids, protocol="quic", tmpfs="/dev/shm/minitopo_experie
                     MAX_WINDOW: "25165824",
                     MAX_STREAM_DATA: "1000000",
                     MAX_STREAM_WINDOW: "16777216",
-                    MAX_STREAMS_BIDI: "1",
-                    MAX_STREAMS_UNI: "1",
+                    MAX_STREAMS_BIDI: "2",
+                    MAX_STREAMS_UNI: "2",
                     IDLE_TIMEOUT: "30000",
                     CC_ALGORITHM: kwargs["cc"],
                     ENABLE_EARLY_DATA: "false",
@@ -98,8 +98,8 @@ def quicTests(topos, topo_ids, protocol="quic", tmpfs="/dev/shm/minitopo_experie
                     MAX_WINDOW_CLIENT: "25165824",
                     MAX_STREAM_DATA_CLIENT: "1000000",
                     MAX_STREAM_WINDOW_CLIENT: "16777216",
-                    MAX_STREAMS_BIDI_CLIENT: "1",
-                    MAX_STREAMS_UNI_CLIENT: "1",
+                    MAX_STREAMS_BIDI_CLIENT: "2",
+                    MAX_STREAMS_UNI_CLIENT: "2",
                     IDLE_TIMEOUT_CLIENT: "30000",
                     WIRE_VERSION: "babababa",
                     DGRAM_PROTO: "none",
@@ -247,15 +247,18 @@ def data_postprocessing(db_path):
     # Clear temp data in table temp
     cursor.execute('DELETE FROM temp_repetition_data')
 
-db_path_harddisk = "/home/bolong/data_quiche/asymmetries/loss/send_different.db"
-db_path_template = "/home/bolong/data_quiche/db_template/db_template.db"
-db_path_tmpfs = "/dev/shm/experiment_data.db"
-def launchTests(times=5):
+# db_path_harddisk = "/home/paul/data_quiche/asymmetries/loss/send_different.db"
+db_path_harddisk = "/home/paul/data_quiche/test.db"
+db_path_template = "/home/paul/data_quiche/db_template/db_template.db"
+db_path_tmpfs = "/tmp/experiment_data.db"
+def launchTests(times=3):
     """ Notice that the loss must occur at time + 2 sec since the minitopo test waits for 2 seconds between launching the server and the client """
     # mptcpTopos = generateExperimentalDesignRandomTopos(nbMptcpTopos=200)
     # logging = open("topos_lowbdp_with_loss.log", 'w')
     # print(mptcpTopos, file=logging)
     # logging.close()
+    # topos = [
+    #          {'paths': [{'queuingDelay': '0.048', 'bandwidth': '51.83', 'delay': '10.5'}, {'queuingDelay': '0.063', 'bandwidth': '45.38', 'delay': '13.3'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.063', 'bandwidth': '45.38', 'delay': '13.3'}, {'queuingDelay': '0.048', 'bandwidth': '51.83', 'delay': '10.5'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.029', 'bandwidth': '49.44', 'delay': '20.6'}, {'queuingDelay': '0.062', 'bandwidth': '34.80', 'delay': '22.1'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}]
     '''
     topos = [
              {'paths': [{'queuingDelay': '0.048', 'bandwidth': '51.83', 'delay': '10.5'}, {'queuingDelay': '0.063', 'bandwidth': '45.38', 'delay': '13.3'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.063', 'bandwidth': '45.38', 'delay': '13.3'}, {'queuingDelay': '0.048', 'bandwidth': '51.83', 'delay': '10.5'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.029', 'bandwidth': '49.44', 'delay': '20.6'}, {'queuingDelay': '0.062', 'bandwidth': '34.80', 'delay': '22.1'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.062', 'bandwidth': '34.80', 'delay': '22.1'}, {'queuingDelay': '0.029', 'bandwidth': '49.44', 'delay': '20.6'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.047', 'bandwidth': '49.72', 'delay': '23.2'}, {'queuingDelay': '0.034', 'bandwidth': '0.14', 'delay': '13.6'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.034', 'bandwidth': '0.14', 'delay': '13.6'}, {'queuingDelay': '0.047', 'bandwidth': '49.72', 'delay': '23.2'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.061', 'bandwidth': '84.79', 'delay': '17.4'}, {'queuingDelay': '0.028', 'bandwidth': '5.93', 'delay': '6.5'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.028', 'bandwidth': '5.93', 'delay': '6.5'}, {'queuingDelay': '0.061', 'bandwidth': '84.79', 'delay': '17.4'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.056', 'bandwidth': '89.55', 'delay': '19.4'}, {'queuingDelay': '0.077', 'bandwidth': '40.86', 'delay': '3.1'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.077', 'bandwidth': '40.86', 'delay': '3.1'}, {'queuingDelay': '0.056', 'bandwidth': '89.55', 'delay': '19.4'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.024', 'bandwidth': '89.13', 'delay': '11.6'}, {'queuingDelay': '0.099', 'bandwidth': '8.97', 'delay': '4.3'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.099', 'bandwidth': '8.97', 'delay': '4.3'}, {'queuingDelay': '0.024', 'bandwidth': '89.13', 'delay': '11.6'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.007', 'bandwidth': '84.62', 'delay': '10.7'}, {'queuingDelay': '0.074', 'bandwidth': '32.00', 'delay': '7.6'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.074', 'bandwidth': '32.00', 'delay': '7.6'}, {'queuingDelay': '0.007', 'bandwidth': '84.62', 'delay': '10.7'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.025', 'bandwidth': '93.83', 'delay': '4.2'}, {'queuingDelay': '0.091', 'bandwidth': '64.68', 'delay': '8.5'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.091', 'bandwidth': '64.68', 'delay': '8.5'}, {'queuingDelay': '0.025', 'bandwidth': '93.83', 'delay': '4.2'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.014', 'bandwidth': '56.25', 'delay': '12.1'}, {'queuingDelay': '0.086', 'bandwidth': '74.61', 'delay': '2.7'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.086', 'bandwidth': '74.61', 'delay': '2.7'}, {'queuingDelay': '0.014', 'bandwidth': '56.25', 'delay': '12.1'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.025', 'bandwidth': '65.62', 'delay': '15.2'}, {'queuingDelay': '0.035', 'bandwidth': '48.51', 'delay': '0.0'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}, {'paths': [{'queuingDelay': '0.035', 'bandwidth': '48.51', 'delay': '0.0'}, {'queuingDelay': '0.025', 'bandwidth': '65.62', 'delay': '15.2'}], 'netem': [(0, 0, 'loss 0.00%'), (1, 0, 'loss 0.00%')]}
@@ -263,8 +266,8 @@ def launchTests(times=5):
              ]
     '''
     topos = []
-    # topos.append(generate_latency_asymmetry_topology(file_size_MB=50, latency_asymmetry_ratio=8, base_latency=25))
-    topos.append(generate_loss_asymmetry_topology(50, 4, 0.1))
+    topos.append(generate_latency_asymmetry_topology(file_size_MB=50, latency_asymmetry_ratio=16, base_latency=25))
+    # topos.append(generate_loss_asymmetry_topology(50, 4, 0.1))
     # print(f"length of topos: {len(topos)}")
     # time.sleep(100000)
     # Copy the db template to tmpfs
@@ -281,7 +284,7 @@ def launchTests(times=5):
     # Insert the dict of topologies into the database
     for topo in topos:
         topology_json = json.dumps(topo)  # Convert to JSON string
-        cursor.execute('INSERT INTO topologies (topology_info) VALUES (?)', (topology_json,))
+        cursor.execute('INSERT INTO topologies (topology) VALUES (?)', (topology_json,))
         topo_ids.append(cursor.lastrowid)
         
     conn.commit()
